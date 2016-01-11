@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6" generator="osmconvert 0.7T" timestamp="2015-12-26T00:27:02Z">
+  <bounds minlat="24.926" minlon="121.346" maxlat="25.209" maxlon="121.676"/>
+  <node id="253385915" lat="25.0477961" lon="121.5170706" version="16" timestamp="2015-10-09T06:03:41Z" changeset="34522878" uid="274857" user="Supaplex">
+    <tag k="name" v="國立台灣大學"/>
+    <tag k="addr:city" v="臺北市"/>
+    <tag k="addr:district" v="大安區"/>
+    <tag k="addr:street" v="羅斯福路四段"/>
+    <tag k="addr:postcode" v="106"/>
+    <tag k="addr:housenumber" v="1"/>
+  </node>
+</osm>

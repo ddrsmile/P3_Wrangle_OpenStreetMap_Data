@@ -5,11 +5,23 @@ import xml.etree.cElementTree as ET
 import pprint
 
 def count_tags(filename):
-  tag = {}
-  for event, elem in ET.iterparse(filename):
-    if elem.tag in tag:
-      tag[elem.tag] += 1
+  tags = {}
+  parsed = ET.iterparse(filename)
+  
+  for _, elem in parsed:
+    if elem.tag in tags:
+      tags[elem.tag] += 1
     else:
-      tag[elem.tag] = 1
-  return tag
+      tags[elem.tag] = 1
 
+    elem.clear()
+  del parsed
+  return tags
+
+def main():
+    FILE = r'../data/inputFile/taipei_city_taiwan.osm'
+    tags = count_tags(FILE)
+    pprint.pprint(tags)
+
+if __name__ == '__main__':
+  main()
