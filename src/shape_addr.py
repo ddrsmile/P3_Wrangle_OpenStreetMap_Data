@@ -29,8 +29,8 @@ pattern = re.compile(ur'..市..區(.+里)?(.+鄰)?(.+路(.+段)?|.+街)(.+巷)?(
 # floor and house name is not necessary to get the post code.
 ADDR_NAME = ['city', 'district', 'village', 'neighborhood','road', 'section', 'street', 'lane', 'alley', 'housenumber', 'floor']
 ADDR_SUFFIX = [u'市', u'區', u'里', u'鄰', u'路', u'段', u'街', u'巷', u'弄', u'號', u'樓']
-ADDR_VALUE_NAME = ['village', 'section', 'lane', 'alley', 'housenumber']
-ADDR_VALUE_SUFFIX = [u'鄰', u'段', u'巷', u'弄', u'號']
+ADDR_VALUE_NAME = ['village', 'section', 'lane', 'alley', 'housenumber', 'floor']
+ADDR_VALUE_SUFFIX = [u'鄰', u'段', u'巷', u'弄', u'號', u'樓']
 
 def isInt(val):
   """Return True if val is in Integer format"""
@@ -91,7 +91,7 @@ def split_addr(full_addr):
 def unite_addr(address):
   full_addr = ''
   for name in ADDR_NAME:
-    if name in address:
+    if name in address and address[name]:
       if not name in ADDR_VALUE_NAME:
         full_addr += address[name]
       else:
@@ -115,6 +115,8 @@ def shape(addr_dict):
       elif re.match( u'..市..區$', addr_dict['city'], re.UNICODE):
         address['city'] = addr_dict['city'][:3]
         address['district'] = addr_dict['city'][3:]
+      elif re.match( u'..區$', addr_dict['city'], re.UNICODE):
+        address['district'] = addr_dict['city']
       else:
         address['city'] = None
       del addr_dict['city']
@@ -135,13 +137,15 @@ def shape(addr_dict):
       full_addr = addr_dict['street']
       address.update(split_addr(full_addr))
       del addr_dict['street']
-
     address.update(addr_dict)
-  
+
   if 'postcode' not in address:
     full_addr = unite_addr(address)
     if pattern.match(full_addr):
-      address['postcode'] = get_postcode_API.get_postcode(full_addr)
+      postcode = get_postcode_API.get_postcode(full_addr)
+      if postcode:
+        address['postcode'] = postcode
+
 
   return address
 
@@ -153,17 +157,16 @@ def test():
                }
 
   addr2 = {'postcode':'106',
-                'full':u'10617臺北市大安區羅斯福路四段1號'}
+                'full':u'臺北市大同區長安西路226號1-4樓'}
 
   addr3 = {
-           'district' : u'大安區',
+           'city' : u'大安區',
            'street' : u'長興街24巷3弄',
            'housenumber' : '3',
           'housename' : u'台大宿舍'}
-  address = shape(addr1)
+  address = shape(addr2)
   for k, v in address.items():
-    print k, v
-
+    print k, ':', v
   print unite_addr(address)
 
 if __name__ == '__main__':

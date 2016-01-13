@@ -12,10 +12,13 @@ street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
 expected = ["Street", "Avenue", "Boulevard", "Drive", "Court", "Place", "Square", "Lane", "Road", 
             "Trail", "Parkway", "Commons"]
 
-mapping = {'St': 'Street',
-           'St.': 'Street',
-           'Ave': 'Avenue',
-           'Rd.': 'Road'
+mapping = {u'台北市': u'臺北市',
+           u'Taipei': u'臺北市',
+           u'Taipei City': u'臺北市',
+           u'台北市(Taipei City)': u'臺北市',
+           u'Taipai': u'臺北市',
+           u'台北': u'臺北市',
+           u'臺北': u'臺北市',
           }
 
 def audit_street_type(street_type, street_name):
@@ -38,6 +41,16 @@ def audit(osmfile):
           audit_street_type(street_types, tag.attrib['v'])
   return street_types
 
+def update(name, mapping):
+  """
+  Return the updated city name
+  Implement in data_updated.py
+  """
+  if name in mapping:
+    name = mapping[name]
+
+  return name
+
 def update_name(name, mapping):
   m = street_type_re.search(name)
   if m:
@@ -52,8 +65,8 @@ def test():
 
   for st_type, ways in st_types.iteritems():
     for name in ways:
-      better_name = update_name(name, mapping):
-        print name, '=>', better_name
+      better_name = update_name(name, mapping)
+      print name, '=>', better_name
         
-if __nane__ == '__main__':
+if __name__ == '__main__':
   test()

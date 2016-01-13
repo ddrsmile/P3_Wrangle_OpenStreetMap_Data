@@ -12,6 +12,7 @@
 
 import json
 import requests
+import time
 from  urllib import quote, unquote
 
 
@@ -28,14 +29,21 @@ def query_site(addr):
 
 def get_postcode(full_addr):
   """Return the postal code if exists. Otherwise, return None."""
+  
+  # to avoid sending large amount requests in a short time
+  #time.sleep(2)
+  # convert utf-8 string into urlencoding string
   addrurl = quote(full_addr.encode('utf8'))
-  result = query_site(addrurl)
+  #result = query_site(addrurl)
+  result = {}
   postcode = ''
   if isinstance(result, dict):
-    postcode = result['zipcode']
+    if 'zipcode' in result:
+      postcode = result['zipcode']
+    else:
+      postcode = None
   else:
     postcode = None
-
   return postcode
 
 def test():
