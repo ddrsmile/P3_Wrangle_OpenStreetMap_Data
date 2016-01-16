@@ -34,14 +34,6 @@ ADDR_SUFFIX = [u'市', u'區', u'里', u'鄰',u'大道', u'路', u'段', u'街',
 ADDR_VALUE_NAME = ['village', 'section', 'lane', 'alley', 'housenumber', 'floor']
 ADDR_VALUE_SUFFIX = [u'鄰', u'段', u'巷', u'弄', u'號', u'樓']
 
-def isInt(val):
-  """Return True if val is in Integer format"""
-  try:
-    int(val)
-    return True
-  except ValueError:
-    return False
-
 def get_index(full_addr, target='city'):
   """Return the index array of each term in a address string"""
   index_dict={}
@@ -66,8 +58,9 @@ def get_postcode(address):
   if not postcode and 'full' in address:
     # check the infromation of address:full contains the string with length more than 5 
     # and first 5 characters are digit
-    if len(address['full'][:5]) == 5 and isInt(address['full'][:5]):
-      postcode = address['full'][:5]
+    chk = re.match(r'^\d{5}', address['full'])
+    if chk:
+      postcode = chk.group()
     else:
       postcode = None
 

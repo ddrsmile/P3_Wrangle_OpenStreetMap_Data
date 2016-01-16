@@ -259,26 +259,29 @@ def shape_element(elem):
 
 def process_map(file_in, pretty = False):
   """Output a JSON file or return the data as a list of dictionaries"""
-  file_out = "{0}.json".format(file_in)
-  # data = []
+  file_out = "{0}.json".format(file_in).replace('input','output')
   with codecs.open(file_out, 'w') as fo:
     for _, elem in ET.iterparse(file_in):
       el = shape_element(elem)
       if el:
-        # data.append(el)
         if pretty:
           fo.write(json.dumps(el, indent = 2, ensure_ascii=False).encode("utf-8") + '\n')
         else:
           fo.write(json.dumps(el, ensure_ascii=False).encode("utf-8") + '\n')
-  # return data
 
 
-def test():
-  # data = process_map('../data/inputFile/taipei_taiwan.osm', True)
-  #OSM_FILE = r'../data/inputFIle/sample.osm'
-
+def main():
+  from zipfile import ZipFile as zf
+  import os
   OSM_FILE = r'../data/inputFIle/taipei_city_taiwan.osm'
+  
+  def open_zip(file_in):
+    with zf('{0}.zip'.format(file_in), 'r') as zipped:
+      zipped.extractall()
+
+  open_zip(OSM_FILE
   process_map(OSM_FILE, True)  
+  os.remove(OSM_FILE)
 
 if __name__ == '__main__':
-  test()
+  main()
