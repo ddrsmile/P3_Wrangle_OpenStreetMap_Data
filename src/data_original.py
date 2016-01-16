@@ -6,17 +6,10 @@ import pprint
 import re
 import codecs
 import json
-#import audit #local python file, used to make the value consistent
 
-OSM_FILE = r'../data/inputFIle/sample.osm'
-JSON_FILE = r'../data/outputFile/sample.json'
-
-#OSM_FILE = r'../data/inputFIle/taipei_city_taiwan.osm'
-#JSON_FILE = r'../data/outputFile/taipei_city_taiwan.json'
 
 wer = re.compile(r'^([a-z]|_)*$')
 lower_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*$')
-lower_two_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*:([a-z]|_)*$')
 problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
 
 CREATED = [ "version", "changeset", "timestamp", "user", "uid"]
@@ -66,11 +59,6 @@ def shape_element(elem):
         node['node_refs'] = []
       node['node_refs'].append(nd.attrib['ref'])
     
-    if 'address' in node:
-      #print node['address']
-      a = {'address': node['address']}
-      print a
-      print (a['address']['city'],len(a['address']['city'])) if 'city' in a['address'] else ('NO CITY',-1)
     return node
   else:
     return None
@@ -89,14 +77,8 @@ def process_map(file_in, pretty = False):
           fo.write(json.dumps(el, ensure_ascii=False).encode("utf-8") + '\n')
   # return data
 
-class MyPrettyPrinter(pprint.PrettyPrinter):
-  def format(self, object, context,  maxlevels, level):
-    if isinstance(object, unicode):
-      return (object.encode('utf8'), True, False)
-    return pprint.PrettyPrinter.format(self, object, context, maxlevels, level)
-
-
 def test():
+  OSM_FILE = r'../data/inputFIle/taipei_city_taiwan.osm'
   # data = process_map('../data/inputFile/taipei_taiwan.osm', True)
   process_map(OSM_FILE, True)  
 

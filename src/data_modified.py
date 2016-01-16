@@ -4,6 +4,74 @@
 # data_updated.py
 # Nan-Tsou Liu
 
+"""
+- Use to transform the data structure in OSM file into data structure in JSON file as follow:
+{
+  "website": "http://www.tasty.com.tw/",
+  "cuisine": "steak_house",
+  "amenity": "restaurant",
+  "name": "西堤",
+  "created": {
+    "changeset": "35961142",
+    "user": "bananatw",
+    "version": "3",
+    "uid": "1215520",
+    "timestamp": "2015-12-15T07:59:29Z"
+  },
+  "opening_hours": "Mo-Su 11:30-14:30,17:30-22:00",
+  "pos": [
+    25.0420496,
+    121.5132871
+  ],
+  "delivery": "no",
+  "phone": [
+    "+886-2-2370-8292"
+  ],
+  "branch": "台北重慶南店",
+  "address": {
+    "city": "臺北市",
+    "postcode": "10045",
+    "district": "中正區",
+    "floor": "2",
+    "section": "一",
+    "housenumber": "129",
+    "road": "重慶南路"
+  },
+  "type": "node",
+  "id": "469812996"
+}
+
+- only 'node' and 'way' tag are processed.
+- All attributes of 'node' and 'way' are turned into k-v pair.
+- The information with 2 colon will turned into 2 layer k-v pair.
+
+    <tag k="addr:city" v="臺北市"/>
+    <tag k="addr:full" v="10045臺北市中正區重慶南路一段129號2樓"/>
+    <tag k="addr:floor" v="2"/>
+    <tag k="addr:street" v="重慶南路一段"/>
+    <tag k="addr:postcode" v="10045"/>
+    <tag k="addr:housenumber" v="129"/>
+
+    becomes:
+    
+    "address": {
+    "city": "臺北市",
+    "postcode": "10045",
+    "district": "中正區",
+    "floor": "2",
+    "section": "一",
+    "housenumber": "129",
+    "road": "重慶南路"
+    },
+
+- If second level tag "k" value contains problematic characters, it is ignored
+
+- if tag is 'way', 
+  <nd ref="123456789"/>
+  <nd ref="223456789"/>
+  becomes:
+  "node_refs": ["123456789", "223456789"]
+"""
 
 import xml.etree.cElementTree as ET
 import pprint
@@ -13,15 +81,9 @@ import json
 import audit #local python file
 import shape_addr #local python file
 
-#OSM_FILE = r'../data/inputFIle/sample.osm'
-#JSON_FILE = r'../data/outputFile/sample.json'
 
-#OSM_FILE = r'../data/inputFIle/taipei_city_taiwan.osm'
-#JSON_FILE = r'../data/outputFile/taipei_city_taiwan.json'
-
-wer = re.compile(r'^([a-z]|_)*$')
+lower = re.compile(r'^([a-z]|_)*$')
 lower_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*$')
-lower_two_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*:([a-z]|_)*$')
 problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
 
 CREATED = [ "version", "changeset", "timestamp", "user", "uid"]
@@ -127,11 +189,10 @@ def update_node(node, kval, tag):
       if sub_attr not in ['postcode', 'full'] and 'full' in node['address']:
         return node
       else:
-        # audit the value of city with function audit.update
+        # audit the city
         if sub_attr == 'city':
           v = audit.update(v, audit.mapping)
-
-        # audit the value of district if the value has 2 character only
+        # audit the district if the value has 2 character only
         # 大安=>大安區(Da'an => Da'an District)
         if sub_attr == 'district':
           if len(v) == 2:
@@ -152,7 +213,6 @@ def update_node(node, kval, tag):
     node[k] = v
 
   return node
-
 
 def shape_element(elem):
   """
@@ -185,7 +245,7 @@ def shape_element(elem):
           node['node_refs'].append(kval)
         
         # remaining tags
-        elif k not in ['k', 'lat', 'lon']:
+        elif k not in ['k','v', 'lat', 'lon']:
           node[k] = kval
 
     elem.clear()

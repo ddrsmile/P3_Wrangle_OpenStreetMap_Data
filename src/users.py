@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# users.py
+# Nan-Tsou Liu
+
+"""
+Use to find out how many unique users.
+Returns a set of unique user IDs ("uid").
+"""
+
 import xml.etree.cElementTree as ET
 import pprint
 import re

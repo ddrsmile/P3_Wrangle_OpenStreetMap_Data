@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# tag.py
+# Nan-Tsou Liu
+
+"""
+Use to check whether the tag k's value is valid or potentially problem.
+"""
+
 import xml.etree.cElementTree as ET
 import pprint
 import re

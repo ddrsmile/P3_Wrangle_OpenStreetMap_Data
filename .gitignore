@@ -3,3 +3,4 @@ Data_Wrangling_with_MongoDB/data/
 tmp/
 src/*.pyc
 .ipynb_checkpoints/
+*.docx

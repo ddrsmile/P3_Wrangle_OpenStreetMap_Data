@@ -31,11 +31,10 @@ def get_postcode(full_addr):
   """Return the postal code if exists. Otherwise, return None."""
   
   # to avoid sending large amount requests in a short time
-  #time.sleep(2)
+  time.sleep(2)
   # convert utf-8 string into urlencoding string
   addrurl = quote(full_addr.encode('utf8'))
-  #result = query_site(addrurl)
-  result = {}
+  result = query_site(addrurl)
   postcode = ''
   if isinstance(result, dict):
     if 'zipcode' in result:
